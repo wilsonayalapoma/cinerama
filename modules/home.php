@@ -1,87 +1,38 @@
-<?php
-// Módulo de página de inicio con video como noticia principal
-?>
 <section class="news-section">
     <div class="row">
         <div class="col-md-8">
             <!-- Video como noticia principal -->
             <div class="video-container mb-4">
-                <iframe src="https://owncloud1692001.fasthostunlimited.com/embed/video" 
-                        allowfullscreen></iframe>
-            </div>
-            <div class="mb-4">
-                <h2 class="mb-3">Video Destacado: Título de la Noticia Principal</h2>
-                <p class="lead">Descripción completa del video noticia. Este contenido ha sido embedido desde el servidor propio y representa la noticia más importante del día.</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <span class="text-muted">Publicado el <?php echo date('d/m/Y'); ?></span>
-                        <span class="badge bg-danger ms-2">En vivo</span>
-                    </div>
-                    <div>
-                        <button class="btn btn-outline-primary btn-sm me-2"><i class="fas fa-share-alt"></i> Compartir</button>
-                        <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-bookmark"></i> Guardar</button>
-                    </div>
-                </div>
+                <iframe src="https://owncloud1692001.fasthostunlimited.com/embed/video" allowfullscreen></iframe>
             </div>
             
             <h2 class="section-title my-4">Últimas Noticias</h2>
             <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="card article-card">
-                        <img src="https://via.placeholder.com/400x250?text=Noticia+1" class="card-img-top" alt="Noticia 1">
-                        <div class="card-body">
-                            <span class="badge bg-primary mb-2">Nacional</span>
-                            <h5 class="card-title">Título de la noticia 1</h5>
-                            <p class="card-text">Breve descripción de la noticia que aparecerá aquí como resumen.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                                <small class="text-muted">Hace 2 horas</small>
+                <?php if (isset($noticias) && is_array($noticias) && count($noticias) > 0): ?>
+                    <?php foreach ($noticias as $noticia): ?>
+                    <div class="col-md-6 mb-4">
+                        <div class="card article-card">
+                            <img src="<?php echo $noticia['imagen'] ?: 'https://via.placeholder.com/400x250?text=Noticia'; ?>" 
+                                 class="card-img-top" alt="<?php echo $noticia['titulo']; ?>">
+                            <div class="card-body">
+                                <span class="badge bg-primary mb-2"><?php echo $noticia['categoria_nombre']; ?></span>
+                                <h5 class="card-title"><?php echo $noticia['titulo']; ?></h5>
+                                <p class="card-text"><?php echo $noticia['resumen']; ?></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="noticia.php?id=<?php echo $noticia['id']; ?>" class="btn btn-primary btn-sm">Leer más</a>
+                                    <small class="text-muted">
+                                        <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'])); ?>
+                                    </small>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card article-card">
-                        <img src="https://via.placeholder.com/400x250?text=Noticia+2" class="card-img-top" alt="Noticia 2">
-                        <div class="card-body">
-                            <span class="badge bg-success mb-2">Internacional</span>
-                            <h5 class="card-title">Título de la noticia 2</h5>
-                            <p class="card-text">Breve descripción de la noticia que aparecerá aquí como resumen.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                                <small class="text-muted">Hace 4 horas</small>
-                            </div>
-                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-12">
+                        <div class="alert alert-info">No hay noticias disponibles en este momento.</div>
                     </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card article-card">
-                        <img src="https://via.placeholder.com/400x250?text=Noticia+3" class="card-img-top" alt="Noticia 3">
-                        <div class="card-body">
-                            <span class="badge bg-warning mb-2">Deportes</span>
-                            <h5 class="card-title">Título de la noticia 3</h5>
-                            <p class="card-text">Breve descripción de la noticia que aparecerá aquí como resumen.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                                <small class="text-muted">Hace 6 horas</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card article-card">
-                        <img src="https://via.placeholder.com/400x250?text=Noticia+4" class="card-img-top" alt="Noticia 4">
-                        <div class="card-body">
-                            <span class="badge bg-info mb-2">Cultura</span>
-                            <h5 class="card-title">Título de la noticia 4</h5>
-                            <p class="card-text">Breve descripción de la noticia que aparecerá aquí como resumen.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                                <small class="text-muted">Ayer</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
         
@@ -89,58 +40,109 @@
             <div class="bg-light-custom p-3 rounded mb-4">
                 <h4>Noticias Destacadas</h4>
                 <div class="list-group">
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Destacada 1: Titular importante</h6>
-                            <small class="text-muted">Hoy</small>
-                        </div>
-                        <p class="mb-1">Resumen breve de la noticia destacada.</p>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Destacada 2: Otro titular</h6>
-                            <small class="text-muted">Hoy</small>
-                        </div>
-                        <p class="mb-1">Resumen breve de la noticia destacada.</p>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Destacada 3: Tercer titular</h6>
-                            <small class="text-muted">Ayer</small>
-                        </div>
-                        <p class="mb-1">Resumen breve de la noticia destacada.</p>
-                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">Destacada 1: Resumen breve</a>
+                    <a href="#" class="list-group-item list-group-item-action">Destacada 2: Resumen breve</a>
+                    <a href="#" class="list-group-item list-group-item-action">Destacada 3: Resumen breve</a>
                 </div>
-            </div>
-            
-            <div class="bg-light-custom p-3 rounded mb-4">
-                <h4>Clasificación Deportiva</h4>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Equipo A
-                        <span class="badge bg-primary rounded-pill">42 pts</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Equipo B
-                        <span class="badge bg-primary rounded-pill">38 pts</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Equipo C
-                        <span class="badge bg-primary rounded-pill">35 pts</span>
-                    </li>
-                </ul>
             </div>
             
             <div class="bg-light-custom p-3 rounded">
                 <h4>Boletín informativo</h4>
                 <p>Suscríbete para recibir las últimas noticias</p>
-                <form>
+                <form id="formSuscripcion">
                     <div class="mb-3">
-                        <input type="email" class="form-control" placeholder="Tu email">
+                        <input type="email" class="form-control" id="emailSuscripcion" 
+                               placeholder="Tu email" required>
+                        <div class="invalid-feedback" id="emailError"></div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Suscribirse</button>
+                    <button type="submit" class="btn btn-primary w-100" id="btnSuscribir">
+                        <span id="btnText">Suscribirse</span>
+                        <div id="btnLoading" class="spinner-border spinner-border-sm d-none" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </button>
                 </form>
+                <div id="mensajeSuscripcion" class="mt-2"></div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formSuscripcion = document.getElementById('formSuscripcion');
+    const emailInput = document.getElementById('emailSuscripcion');
+    const btnSuscribir = document.getElementById('btnSuscribir');
+    const btnText = document.getElementById('btnText');
+    const btnLoading = document.getElementById('btnLoading');
+    const mensajeSuscripcion = document.getElementById('mensajeSuscripcion');
+    const emailError = document.getElementById('emailError');
+
+    formSuscripcion.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = emailInput.value.trim();
+        
+        // Validación básica
+        if (!email) {
+            emailInput.classList.add('is-invalid');
+            emailError.textContent = 'Por favor ingresa tu email';
+            return;
+        }
+        
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            emailInput.classList.add('is-invalid');
+            emailError.textContent = 'Por favor ingresa un email válido';
+            return;
+        }
+        
+        emailInput.classList.remove('is-invalid');
+        
+        // Mostrar loading
+        btnText.classList.add('d-none');
+        btnLoading.classList.remove('d-none');
+        btnSuscribir.disabled = true;
+        mensajeSuscripcion.textContent = '';
+        mensajeSuscripcion.className = 'mt-2';
+        
+        // Enviar petición AJAX
+        fetch('procesar_suscripcion.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'email=' + encodeURIComponent(email)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mensajeSuscripcion.textContent = data.message;
+                mensajeSuscripcion.className = 'mt-2 alert alert-success';
+                formSuscripcion.reset();
+            } else {
+                mensajeSuscripcion.textContent = data.message;
+                mensajeSuscripcion.className = 'mt-2 alert alert-danger';
+            }
+        })
+        .catch(error => {
+            mensajeSuscripcion.textContent = 'Error de conexión. Intenta nuevamente.';
+            mensajeSuscripcion.className = 'mt-2 alert alert-danger';
+        })
+        .finally(() => {
+            // Ocultar loading
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+            btnSuscribir.disabled = false;
+        });
+    });
+
+    // Limpiar mensajes cuando el usuario empiece a escribir
+    emailInput.addEventListener('input', function() {
+        if (this.classList.contains('is-invalid')) {
+            this.classList.remove('is-invalid');
+        }
+        mensajeSuscripcion.textContent = '';
+        mensajeSuscripcion.className = 'mt-2';
+    });
+});
+</script>

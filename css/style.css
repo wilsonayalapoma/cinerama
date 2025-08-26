@@ -213,6 +213,27 @@ body {
   background-color: #660666;
 }
 
+/* Estilos para el formulario de suscripción */
+#mensajeSuscripcion {
+  font-size: 0.9rem;
+}
+
+#btnLoading {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Validación visual */
+.is-invalid {
+  border-color: var(--danger-color) !important;
+}
+
+.invalid-feedback {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--danger-color);
+}
+
 /* Footer */
 footer {
   margin-top: auto;

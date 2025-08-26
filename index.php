@@ -1,9 +1,73 @@
+<?php
+// Incluir configuración de la base de datos
+require_once 'config/database.php';
+
+// Obtener la página actual
+$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+
+// Páginas permitidas
+$allowed_pages = ['home', 'national', 'international', 'sports', 'culture', 'video'];
+if (!in_array($page, $allowed_pages)) {
+    $page = 'home';
+}
+
+// Obtener noticias destacadas
+$database = new Database();
+$db = $database->getConnection();
+
+// Función para obtener noticias
+function getNoticias($db, $categoria = null, $limit = 6) {
+    $query = "SELECT n.*, c.nombre as categoria_nombre 
+              FROM noticias n 
+              LEFT JOIN categorias c ON n.categoria_id = c.id";
+    
+    if ($categoria) {
+        $query .= " WHERE c.slug = :categoria";
+    }
+    
+    $query .= " ORDER BY n.fecha_publicacion DESC LIMIT :limit";
+    
+    $stmt = $db->prepare($query);
+    
+    if ($categoria) {
+        $stmt->bindParam(':categoria', $categoria);
+    }
+    
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Obtener noticias para la página actual
+//if ($page == 'home') {
+//    $noticias = getNoticias($db, null, 8);
+//} else {
+//    $noticias = getNoticias($db, $page, 8);
+//}
+// 
+?>
+
+
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CineramaTv</title>
+    <meta name="description" content="Las últimas noticias de actualidad nacional e internacional. Mantente informado con CineramaTV.">
+    <meta name="keywords" content="noticias, actualidad, periódico, news, nacional, internacional">
+    <meta name="author" content="CineramaTV">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="CineramaTV - Noticias de Actualidad en Bolivia">
+    <meta property="og:description" content="Las últimas noticias de actualidad nacional e internacional">
+    <meta property="og:image" content="https://cineramatv.com/assets/img/logo.png">
+    <meta property="og:url" content="https://cineramatv.com/">
+    <meta property="og:type" content="website">
+
+
+
     <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
@@ -16,6 +80,36 @@
     />
     <!-- CSS personalizado -->
     <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .user-icon {
+        color: white;
+        font-size: 1.2rem;
+        margin-left: 15px;
+        transition: color 0.3s ease;
+      }
+      
+      .user-icon:hover {
+        color: var(--accent-color);
+      }
+      
+      .navbar-search-container {
+        display: flex;
+        align-items: center;
+      }
+      
+      @media (max-width: 991px) {
+        .navbar-search-container {
+          margin-top: 15px;
+          width: 100%;
+          justify-content: center;
+        }
+        
+        .user-icon {
+          margin-left: 10px;
+          margin-right: 10px;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- Header (sería un include en PHP) -->
@@ -98,26 +192,83 @@
                 >
               </li>
             </ul>
-            <form class="d-flex">
-              <input
-                class="form-control me-2"
-                type="search"
-                placeholder="Buscar..."
-                aria-label="Search"
-              />
-              <button class="btn btn-outline-primary" type="submit">
-                Buscar
-              </button>
-            </form>
+            
+            <div class="navbar-search-container">
+              <form class="d-flex">
+                <input
+                  class="form-control me-2"
+                  type="search"
+                  placeholder="Buscar..."
+                  aria-label="Search"
+                />
+                <button class="btn btn-outline-light" type="submit">
+                  Buscar
+                </button>
+              </form>
+              
+              <!-- Icono de usuario -->
+              <a href="#" class="user-icon" data-bs-toggle="modal" data-bs-target="#loginModal">
+                <i class="fas fa-user-circle"></i>
+              </a>
+            </div>
           </div>
         </div>
       </nav>
     </header>
 
+    <!-- Modal de Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" required>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" required>
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="remember">
+                <label class="form-check-label" for="remember">Recordarme</label>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+            </form>
+            <div class="text-center mt-3">
+              <p>¿No tienes cuenta? <a href="#" class="text-primary">Regístrate</a></p>
+              <a href="#" class="text-muted">¿Olvidaste tu contraseña?</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Contenido Principal (carga dinámica SPA) -->
     <main class="container my-3 spa-content" id="spa-content">
-      <!-- El contenido se carga aquí dinámicamente mediante AJAX -->
-      <?php include 'modules/home.php'; ?>
+        <!-- El contenido se carga según la página -->
+        <?php
+        // Determinar qué módulo cargar y obtener las noticias correspondientes
+        if ($page == 'home') {
+            $noticias = getNoticias($db, null, 8);
+            include 'modules/home.php';
+        } else {
+            $noticias = getNoticias($db, $page, 8);
+            $module_file = "modules/$page.php";
+            if (file_exists($module_file)) {
+                include $module_file;
+            } else {
+                // Si el archivo no existe, cargar home por defecto
+                $noticias = getNoticias($db, null, 8);
+                include 'modules/home.php';
+            }
+        }
+        ?>
     </main>
 
     <!-- Footer (sería un include en PHP) -->
@@ -159,7 +310,6 @@
         </p>
       </div>
     </footer>
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery para AJAX -->
